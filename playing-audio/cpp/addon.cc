@@ -69,20 +69,22 @@ void updateAsync(uv_async_t* req, int status) {
     Isolate* isolate = Isolate::GetCurrent();
     HandleScope scope(isolate);
     
-    AsyncMessage* asyncMessage = (AsyncMessage*) req->data;
+    AsyncMessage* msg = (AsyncMessage*) req->data;
     
     Local<Function> callBack = Local<Function>::New(isolate,message->callBack);
-
+    Local<Object> data = Object::New(isolate);
+    data->Set(String::NewFromUtf8(isolate, "curpos"), Number::New(isolate,msg->position));
+    data->Set(String::NewFromUtf8(isolate,"duration"),Number::New(isolate,msg->duration));
     
-    Local<Number> arr = Number::New(isolate,asyncMessage->position);
+    //Local<Number> arr = Number::New(isolate,msg->position);
     Local<Value> argv[] = {
-            arr
+            data
     };
     callBack->Call(isolate->GetCurrentContext()->Global(), 1, argv);
 //    if(!asyncMessage->playing){
 //        m_brk = 0;
 //    }
-    delete asyncMessage;
+    delete msg;
 }
 
 
